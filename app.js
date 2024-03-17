@@ -55,7 +55,7 @@ app.post("/api/survey", async (req, resp) => {
       .status(201)
       .json({ message: "Document inserted successfully", survey });
   } catch (error) {
-    resp.status(500).json({ message: "Internal Server error" });
+    resp.status(500).json({ message: "Internal Server error !" });
   }
 });
 
@@ -80,7 +80,7 @@ app.post("/api/htmltoimage", async (req, resp) => {
 
     resp.send({ imageBase64: imageBuffer });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error: ", error);
     resp.status(500).json({ error: "Internal Server Error" });
   }
 });
