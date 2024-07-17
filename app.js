@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const puppeteer = require("puppeteer");
 const app = express();
 const mysql= require("mysql");
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const cors = require("cors");
