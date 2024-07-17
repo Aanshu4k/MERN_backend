@@ -30,7 +30,7 @@ const connection = mysql.createConnection({
   database: "mcr",
 });
 
-//API to fetch list of survey from mongoDB collection
+//API to fetch list   of survey from mongoDB collection
 app.get("/api/getSurveyList", async (req, resp) => {
   try {
     const surveyData = await Survey.find({fetch_flag:'N'}).limit(5);
@@ -95,47 +95,62 @@ connection.connect((err) => {
 });
 app.use(bodyParser.json());
 //API to login
-app.post("/api/login", async (req, resp) => {
-  try {
-    const { userid, password } = req.body;
-    if (!userid || !password) {
-      return resp
-        .status(400)
-        .json({ message: "Username and password are required" });
-    }
-    const updateDateQuery= `update MCR_LOGIN_MST set ACTIVE_FLAG='Y',LAST_LOGIN_DATE= NOW() where LOGIN_ID= ?`;
-    const checkQuery = `SELECT * FROM mcr_login_mst WHERE LOGIN_ID  = ? AND PASSWORD= ? `;
-    connection.query(
-      checkQuery,
-      [userid, password],
-      (err, results) => {
-        if (err) {
-          console.error("Error executing query:", error);
-          resp.status(500).json({ error: "Internal server error" });
-          return;
-        }
+// app.post("/api/login", async (req, resp) => {
+//   try {
+//     const { userid, password } = req.body;
+//     if (!userid || !password) {
+//       return resp
+//         .status(400)
+//         .json({ message: "Username and password are required" });
+//     }
+//     const updateDateQuery= `update MCR_LOGIN_MST set ACTIVE_FLAG='Y',LAST_LOGIN_DATE= NOW() where LOGIN_ID= ?`;
+//     const checkQuery = `SELECT * FROM mcr_login_mst WHERE LOGIN_ID  = ? AND PASSWORD= ? `;
+//     connection.query(
+//       checkQuery,
+//       [userid, password],
+//       (err, results) => {
+//         if (err) {
+//           console.error("Error executing query:", error);
+//           resp.status(500).json({ error: "Internal server error" });
+//           return;
+//         }
 
-        if (results.length === 1) {
-          // User exists and password matches, create JWT token
-          const user = results[0];
-          const token = jwt.sign({ loginid: user.loginid }, 'abcd1234', { expiresIn: '1h' });
-          connection.query(updateDateQuery,[userid,password],(updateErr)=>{
-            if(updateErr){
-              console.log("Error updating LAST Login Date: ",updateErr);
-              resp.status(500).json({error:"Internal server error!"});
-              return;
-            }
-            resp.json({token});
-          })
-        } else {
-          // User not found or password incorrect
-          resp.status(401).json({ error: 'Invalid login credentials' });
-        }
-      }
-    );
-  } catch (error) {
-    console.log("Error : ", error);
-    resp.status(500).json({ error: "Internal Server Error !" });
+//         if (results.length === 1) {
+//           // User exists and password matches, create JWT token
+//           const user = results[0];
+//           const token = jwt.sign({ loginid: user.loginid }, 'abcd1234', { expiresIn: '1h' });
+//           connection.query(updateDateQuery,[userid,password],(updateErr)=>{
+//             if(updateErr){
+//               console.log("Error updating LAST Login Date: ",updateErr);
+//               resp.status(500).json({error:"Internal server error!"});
+//               return;
+//             }
+//             resp.json({token});
+//           })
+//         } else {
+//           // User not found or password incorrect
+//           resp.status(401).json({ error: 'Invalid login credentials' });
+//         }
+//       }
+//     );
+//   } catch (error) {
+//     console.log("Error : ", error);
+//     resp.status(500).json({ error: "Internal Server Error !" });
+//   }
+// });
+
+const adminCredentials = {
+  id: 'admin',
+  password: 'admin'
+};
+
+app.post('/api/login', (req, res) => {
+  const { id, password } = req.body;
+
+  if (id === adminCredentials.id && password === adminCredentials.password) {
+    res.status(200).json({ message: 'Login successful', token: 'your_jwt_token' });
+  } else {
+    res.status(401).json({ message: 'Invalid credentials' });
   }
 });
 
